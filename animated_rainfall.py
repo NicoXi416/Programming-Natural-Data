@@ -1,34 +1,52 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+import numpy as np
 
 # Load the CSV file
 csv_path = r"c:\Users\user.V915-31\Downloads\daily_CCH_RF_ALL.csv"
-data = pd.read_csv(csv_path)
 
-# Preview columns and data
+
+# Read the CSV, skipping the first two header rows
+data = pd.read_csv(csv_path, skiprows=2)
 data = data.dropna()
-print(data.head())
 
-# Example: Use rainfall (RF) and date for animation
-# Adjust column names if needed
-dates = pd.to_datetime(data['Date']) if 'Date' in data.columns else range(len(data))
-rf = data['RF'] if 'RF' in data.columns else data.iloc[:,1]
+# Extract date and rainfall value
+years = data['年/Year']
+months = data['月/Month']
+days = data['日/Day']
+rainfall = pd.to_numeric(data['數值/Value'], errors='coerce')
 
-fig, ax = plt.subplots(figsize=(10, 6))
-ax.set_xlim(0, len(rf))
-ax.set_ylim(0, max(rf)*1.2)
-ax.set_title('Animated Rainfall Visualization')
-ax.set_xlabel('Day')
-ax.set_ylabel('Rainfall (mm)')
+# Create a date string for each entry
+dates = years.astype(str) + '-' + months.astype(str).str.zfill(2) + '-' + days.astype(str).str.zfill(2)
 
-bars = ax.bar(range(len(rf)), [0]*len(rf), color=plt.cm.Blues(rf/max(rf)))
+# Artistic Rainfall Drops Animation
+fig, ax = plt.subplots(figsize=(12, 8))
+ax.set_xlim(0, 1)
+ax.set_ylim(0, 1)
+ax.set_facecolor('#222244')
+ax.axis('off')
+
+# Normalize rainfall for size and color
+rain_norm = (rainfall - rainfall.min()) / (rainfall.max() - rainfall.min())
+sizes = 200 + rain_norm * 1800  # Circle size
+colors = plt.cm.cool(rain_norm)
+
+# Random horizontal positions for drops
+np.random.seed(42)
+x_pos = np.random.uniform(0.1, 0.9, len(rainfall))
 
 def animate(i):
-    for j, b in enumerate(bars):
-        b.set_height(rf[j] if j <= i else 0)
-        b.set_color(plt.cm.Blues(rf[j]/max(rf)))
-    return bars
+    ax.clear()
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.set_facecolor('#222244')
+    ax.axis('off')
+    # Draw all previous drops faded, current drop bright
+    ax.scatter(x_pos[:i], np.linspace(0.9, 0.1, i), s=sizes[:i], c=colors[:i], alpha=0.3, edgecolors='white', linewidths=1)
+    ax.scatter(x_pos[i], 0.5, s=sizes[i], c=[colors[i]], alpha=0.9, edgecolors='white', linewidths=2)
+    ax.text(0.5, 1.02, f"Rainfall: {rainfall[i]:.1f} mm\nDate: {dates[i]}", ha='center', va='bottom', color='white', fontsize=18, transform=ax.transAxes)
+    return []
 
-ani = FuncAnimation(fig, animate, frames=len(rf), interval=50, blit=False)
+ani = FuncAnimation(fig, animate, frames=len(rainfall), interval=60, blit=False)
 plt.show()
