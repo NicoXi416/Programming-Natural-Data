@@ -34,5 +34,11 @@ This project transforms daily rainfall data from Cheung Chau into both informati
 ## Customization
 - You can adjust colors, animation speed, and styles in each script to suit your artistic vision.
 
+
+## Artistic Concept & Creative Choices
+Rainfall is a natural phenomenon that varies daily, creating patterns that are both informative and visually compelling. By transforming rainfall data into animated drops, waves, and streaks, this project explores the boundary between scientific data visualization and generative art. The size, color, and movement of each visual element are directly influenced by the rainfall amount, allowing viewers to intuitively sense changes in weather over time.
+
+The visualizations are designed to evoke the feeling of rain—sometimes gentle, sometimes intense—while maintaining a connection to the underlying data. This approach demonstrates how environmental metrics can inspire creative expression and help communicate natural processes in a more engaging way.
+
 ## License
 This project is for educational and creative purposes.
